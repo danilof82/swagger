@@ -1,0 +1,789 @@
+swagger: "2.0"
+info:
+  description: API para cargar cometidos funcionarios al tramite con firma electrónica y revisión de Contraloría Interna, con el fin de ser cargados al SISPER y SIAPER 
+  version: 1.0.0
+  title: Cometidos Funcionarios API
+  contact:
+    email: cesar.aguilera@uchile.cl
+
+tags:
+- name: Cometidos
+  description: API Cometidos
+- name: Movimientos
+  description: API Movimientos de Cometidos
+- name: Historial
+  description: API Historial de Cometidos
+- name: Masivo
+  description: API Movimientos Masivos de Cometidos
+  
+paths:
+  /organismos/{cod_organismo}/cometidos:
+    get:
+      tags:
+      - Cometidos
+      summary: listar cometidos (No implementado)
+      operationId: searchCometidos
+      description: obtiene todos los cometidos cargados
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: cod_organismo
+        required: true
+        description: código del organismo emisor (Ej. 111042 para ingeniería). Obtener código desde http://front-test6402.uchile.cl/siaper-json/diccionario/servicio.json
+        type: integer
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+            
+    post:
+      tags:
+      - Cometidos
+      summary: agregar un cometido
+      operationId: addCometido
+      description: permite agregar un cometido
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: cod_organismo
+        required: true
+        description: código del organismo emisor (Ej. 111042 para ingeniería). Obtener código desde http://front-test6402.uchile.cl/siaper-json/diccionario/servicio.json
+        type: integer
+      - in: body
+        name: Cometido
+        required: true
+        description: json para ingresar un cometido
+        schema:
+          $ref: "#/definitions/BodyCometido" 
+      responses:
+        201:
+          description: id de cometido creado
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+                format: uuid
+                example: 5ae34a3ea42e2804c0e524bb1
+              link_resource:
+                type: string
+                example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+
+  /cometidos/{id}:
+    get:
+      tags:
+      - Cometidos
+      summary: obtener cometido
+      operationId: searchCometidosId
+      description: obtiene el cometido a través de su id
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      responses:
+        200:
+          description: obtiene cometido encontrado
+          schema:
+            $ref: "#/definitions/Cometido"
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+
+    put:
+      tags:
+      - Cometidos
+      summary: actualizar un cometido (No implementado)
+      operationId: updateCometidosId
+      description: actualizar el cometido obtenido a través de su id
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+
+    patch:
+      tags:
+      - Cometidos
+      summary: actualizar parcialemente un cometido
+      operationId: updatePatchCometidosId
+      description: actualizar parcialmente el cometido obtenido a través de su id
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      responses:
+        200:
+          description: obtiene cometido encontrado
+          schema:
+            properties:
+              estado:
+                type: string
+                description: estado del cometido
+                example: Oficializar
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+
+    delete:
+      tags:
+      - Cometidos
+      summary: eliminar un cometido (No implementado)
+      operationId: deleteCometidosId
+      description: eliminar el cometido obtenido a través de su id
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+
+  /cometidos/{id}/movimientos:
+    get:
+      tags:
+      - Movimientos
+      summary: obtener lista de los movimientos asociados a un cometido
+      operationId: searchMovimientosCometidosId
+      description: obtiene los movimientos a través del id del cometido
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      responses:
+        200:
+          description: obtiene los movimientos encontrados
+          schema:
+            type: array
+            items:
+              example:  http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1/movimientos/5ae34a3ea42e2804c0e524bb
+              
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+            
+    post:
+      tags:
+      - Movimientos
+      summary: agregar un movimiento al cometido
+      operationId: addMovimientoCometido
+      description: permite agregar un movimiento al cometido individualizado por su id
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: body
+        name: Movimiento
+        required: true
+        description: json para ingresar un movimiento al cometido
+        schema:
+          $ref: "#/definitions/BodyMovimiento"
+      responses:
+        201:
+          description: id de movimiento creado
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+                format: uuid
+                example: 5ae34a3ea42e2804c0e524bb
+              link_resource:
+                type: string
+                example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1/movimientos/5ae34a3ea42e2804c0e524bb
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+
+  /cometidos/{id}/movimientos/{id_mov}:
+    get:
+      tags:
+      - Movimientos
+      summary: obtener el movimientos asociados al cometido por su id
+      operationId: searchMovimientosIdCometidosId
+      description: obtiene el movimiento del cometido a través del id de cometido y movimiento
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: path
+        name: id_mov
+        required: true
+        description: id del movimiento
+        type: string
+      responses:
+        200:
+          description: obtiene los movimientos encontrados
+          schema:
+            $ref: "#/definitions/Movimiento"
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+
+    put:
+      tags:
+      - Movimientos
+      summary: actualizar un movimiento del cometido (No implementado)
+      operationId: updateMovimientosIdCometidosId
+      description: actualizar un movimiento del cometido obtenido a través de su id
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: path
+        name: id_mov
+        required: true
+        description: id del movimiento
+        type: string
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+
+    patch:
+      tags:
+      - Movimientos
+      summary: actualizar parcialemente el movimiento de un cometido (No implementado)
+      operationId: updatePatchMovimientosIdCometidosId
+      description: actualizar parcialmente el movimiento de un cometido obtenido a través de su id
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: path
+        name: id_mov
+        required: true
+        description: id del movimiento
+        type: string
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+
+    delete:
+      tags:
+      - Movimientos
+      summary: eliminar un movimiento de un cometido (No implementado)
+      operationId: deleteMovimientosIdCometidosId
+      description: eliminar un movimiento de un cometido obtenido a través de su id
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: path
+        name: id_mov
+        required: true
+        description: id del movimiento
+        type: string
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+            
+  /cometidos/{id}/historial:
+    get:
+      tags:
+      - Historial
+      summary: obtener lista de historia asociada a un cometido
+      operationId: searchHistorialCometidosId
+      description: obtiene el historial a través del id del cometido
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      responses:
+        200:
+          description: obtiene el historial encontrados
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Historial"
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+            
+    post:
+      tags:
+      - Historial
+      summary: agregar un historial al cometido (No implementado)
+      operationId: addHistorialCometido
+      description: permite agregar un historial al cometido individualizado por su id
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: body
+        name: Historial
+        required: true
+        description: json para ingresar un movimiento al cometido
+        schema:
+          $ref: "#/definitions/BodyMovimiento"
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+
+  /cometidos/{id}/movimientos/masivo:
+    get:
+      tags:
+      - Masivo
+      summary: obtener lista de movimientos de forma masiva al cometido (No implementado)
+      operationId: searchMovimientoCometidoMasivo
+      description: permite listar de forma masiva movimientos al cometido individualizado por su id
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: cod_organismo
+        required: true
+        description: código del organismo emisor (Ej. 111042 para ingeniería). Obtener código desde http://front-test6402.uchile.cl/siaper-json/diccionario/servicio.json
+        type: integer
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: body
+        name: Movimientos
+        required: true
+        description: json para ingresar un movimiento al cometido
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/BodyMovimiento"
+      responses:
+        405:
+          description: metodo no implementado
+          schema:
+            $ref: "#/definitions/return405"
+            
+    post:
+      tags:
+      - Masivo
+      summary: agregar movimientos de forma masiva al cometido
+      operationId: addMovimientoCometidoMasivo
+      description: permite agregar de forma masiva movimientos al cometido individualizado por su id
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id del cometido
+        type: string
+      - in: body
+        name: Movimientos
+        required: true
+        description: json para ingresar un movimiento al cometido
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/BodyMovimiento"
+      responses:
+        201:
+          description: id de movimiento creado
+          schema:
+            type: array
+            items:
+              properties:
+                _id:
+                  type: string
+                  format: uuid
+                  example: 5ae34a3ea42e2804c0e524bb1
+                link_resource:
+                  type: string
+                  example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1/movimientos/5ae34a3ea42e2804c0e524bb
+        400:
+          description: solicitud incorrecta
+          schema:
+            $ref: "#/definitions/return400"
+        404:
+          description: recurso no encontrado
+          schema:
+            $ref: "#/definitions/return404"
+            
+definitions:
+  BodyCometido:
+    type: object
+    required:
+    - metadata
+    - tipo
+    - firmantes
+    properties:
+      metadata:
+        description: diccionario para incorporar los datos relacionados con el comentido, como el número interno, vistos, considerandos, resuelvo, etc
+        type: object
+        properties:
+          vistos: 
+            type: string
+            example: Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+          resuelvo: 
+            type: string
+            example: Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+          considerandos: 
+            type: string
+            example: Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+          numero_facultad: 
+            type: string
+            example: 123456
+      tipo:
+        description: tipo del cometido. Las opciones aceptadas son [DECRETO EXENTO, RESOLUCIÓN EXENTA]
+        type: string 
+        example: DECRETO EXENTO
+      firmantes:
+        description: lista de firmantes para el cometido. los firmantes autorizados se pueden obtener desde 
+        type: array
+        items:
+          properties:
+            rut:
+              description: rut del firmante
+              type: string
+              example: 15219036-0
+            nombre:
+              description: nombre del firmante
+              type: string
+              example: César Aguilera Sepúlveda
+            rol:
+              description: Rol del firmante
+              type: string
+              example: Director Unidad (S)
+              
+  Cometido:
+    allOf:
+    - $ref: "#/definitions/BodyCometido"
+    type: object
+    properties:
+      _id:
+        type: string
+        format: uuid
+        description: id del cometido autogenerado por el servicio
+        example: 5ae34a3ea42e2804c0e524bb1
+      fecha:
+        description: fecha en que fue registrado el cometido asignada por el servicio
+        type: string
+        example: "2016-08-29T09:12:33"
+      cod_organismo:
+        description: código del organismo emisor
+        type: integer
+        example: 111042
+      organismo:
+        description: nombre del organismo emisor
+        type: string
+        example: FACULTAD DE CIENCIAS FÍSICAS Y MATEMÁTICAS UNIVERSIDAD DE CHILE
+      numero_decreto:
+        description: Número de decreto generado en el SISPER
+        type: string
+        example: 0066453
+      id_expediente:
+        description: Número del expediente que se firmará electrónicamente
+        type: string
+        example: 7ae34a3ea42e2804c0e54sd2
+      estado:
+        type: string
+        description: Indica el estado en que se encuentra el cometido
+        example: Oficializado
+      link_resource:
+        type: string
+        description: link con la url del recurso
+        example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1
+      link_movimientos:
+        type: string
+        description: link con la url del recurso
+        example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1/movimientos
+      link_historial:
+        type: string
+        description: link con la url del recurso
+        example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1/historial
+        
+  BodyMovimiento:
+    type: object
+    required:
+      - actividad
+      - cod_servicio_destino
+      - cod_comuna_destino
+      - fecha_desde
+      - fecha_hasta
+      - motivo
+      - monto
+      - beneficios
+      - adjuntos
+    properties:
+      actividad:
+        type: string
+        description: actividad vigente del beneficiario durante las fechas del movimiento
+        example: A110401232015
+      cod_servicio_destino:
+        type: integer
+        description: código servicio destino del movimiento del cometido. se debe obtener código desde servicio http://front-test6402.uchile.cl/siaper-json/diccionario/servicio.json
+        example: 117795
+      cod_comuna_destino:
+        type: integer
+        description: código comuna de destino del movimiento del cometido. se debe obtener key desde servicio http://front-test6402.uchile.cl/siaper-json/diccionario/comuna.json
+        example: 368
+      fecha_desde:
+        description: fecha de inicio del movimiento del cometido. formato yyyy-mm-ddTHH:MM:SS
+        type: string
+        example: "2016-08-29T09:12:33"
+      fecha_hasta:
+        description: fecha de térmico del movimiento del cometido. formato yyyy-mm-ddTHH:MM:SS
+        type: string
+        example: "2016-08-29T09:12:33"
+      motivo:
+        description: motivo del movimiento del cometido. los posibles valores son ["Visita Inspectiva o de Fiscalización", "Practicar Notificación(es)", "Reunión en otra dependencia del servicio", "Asistencia a Curso y/o actividad de capacitación", "Reunión fuera del servicio", "Concurrir a citación", "Otras"]
+        type: string
+        example: Reunión fuera del servicio
+      monto: 
+        description: Monto total asignado al movimiento del cometido
+        type: integer
+        example: 500000
+      beneficios:
+        description: lista de beneficios otorgados para el movimiento de comentido
+        type: array
+        items:  
+          required:
+            - nombre
+            - monto
+            - centro_costo
+          properties:
+            nombre: 
+              type: string
+              description: nombre del beneficio. Los posibles valores son [ "Alojamiento", "Pasaje", "Viático", "Otros"]. Cuando el nombre sea otros se considerará el valor de la descripción
+              example: Alojamiento
+            monto: 
+              description: monto del beneficio
+              type: integer
+              example: 300000
+            centro_costo: 
+              description: centro de costo al que queda asociado el monto del beneficio
+              type: integer
+              example: 11AB-G645
+            descripcion: 
+              description: descripción del beneficio
+              type: string
+              example: Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+          
+      adjuntos:
+        description: lista de links de archivos adjuntos como evidencia del movimiento del comentido
+        type: array
+        items:  
+          required:
+            - nombre
+            - url
+          properties:
+            nombre: 
+              type: string
+              description: nombre del archivo
+              example: Carta de Invitación
+            url: 
+              description: link de archivo de evidencia
+              type: string
+              example: http://uchile.cl/archivos/cartacometido.pdf
+            metadata: 
+              description: diccionario para incorporar datos relacionados con el archivo
+              type: object
+              properties:
+                fecha_recepcion: 
+                  type: string
+                  example: Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+                dirigida: 
+                  type: string
+                  example: Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+
+  Movimiento:
+    allOf:
+    - $ref: "#/definitions/BodyMovimiento"
+    type: object
+    properties:
+      _id:
+        type: string
+        format: uuid
+        description: id del movimiento asociado al cometido autogenerado por el servicio
+        example: 5ae34a3ea42e2804c0e524bb
+      link_resource:
+        type: string
+        description: link con la url del recurso
+        example: http://local.uchile.cl:5000/cometidos/5ae34a3ea42e2804c0e524bb1/movimientos/5ae34a3ea42e2804c0e524bb
+      servicio_destino:
+        type: string
+        description: nombre servicio destino del movimiento del cometido
+        example: FACULTAD DE MEDICINA
+      cod_region_destino:
+        type: integer
+        description: código región destino del movimiento del cometido
+        example: 13
+      region_destino:
+        type: string
+        description: nombre región destino del movimiento del cometido
+        example: REGIÓN METROPOLITANA
+      comuna_destino:
+        type: string
+        description: nombre comuna destino del movimiento del cometido
+        example: SANTIAGO
+      
+  Historial:
+    type: object
+    properties:
+      fecha:
+        type: string
+        example: "2016-08-29T09:12:33"
+      estado:
+        type: string
+        example: Oficializado
+
+  return404:
+    type: object
+    properties:
+      explanation:
+        type: string
+        example: No existe el recurso...
+      message:
+        type: string
+        example: Resource Not Found
+      status_code:
+        type: integer
+        example: 404
+
+  return400:
+    type: object
+    properties:
+      explanation:
+        type: string
+        example: Falta el atributo... o Valor incorrecto... o Formato incorrecto...
+      message:
+        type: string
+        example: Bad Request
+      status_code:
+        type: integer
+        example: 400
+
+  return405:
+    type: object
+    properties:
+      explanation:
+        type: string
+        example: Método no implementado
+      message:
+        type: string
+        example: Method Not Allowed
+      status_code:
+        type: integer
+        example: 405
+
+
+basePath: /cometidos-api-back
+host: front-desa6402.uchile.cl
+schemes:
+ - https
+ - http
